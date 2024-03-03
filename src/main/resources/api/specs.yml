@@ -1,0 +1,199 @@
+openapi: 3.0.3
+info:
+  title: 'Book Service'
+  version: 1.0.0
+  description: 'Rest service to perform operations on books in the library'
+servers:
+  - url: https://localhost:8080/api
+tags:
+  - name: Fetch
+    description: Get operations on one or more than one books
+  - name: Admin
+    description: Create/update/delete operations on one or more than one books to manage library
+paths:
+  /v1/books:
+    post:
+      tags:
+        - Admin
+      summary: Create a new book
+      description: Create a new book with or without ISBN number
+      operationId: createNewBook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+        required: true
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+        400:
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+    get:
+      tags:
+        - Fetch
+      summary: Get details of all the books
+      description: Get details of all the books in the library
+      operationId: getAllBooks
+      parameters:
+        - name: inStock
+          in: query
+          description: To get only the details of books which are in stock
+          schema:
+            type: boolean
+            default: true
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+        204:
+          description: No books present in the library
+    put:
+      tags:
+        - Admin
+      summary: Update the details of the book
+      description: Update the details of the book from it's ID in the library
+      operationId: updateBookDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+        required: true
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+        204:
+          description: Book not present in the library
+        422:
+          description: Unmodifiable object tried to be modified in a book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+
+  /v1/books/{id}:
+    get:
+      tags:
+        - Fetch
+      summary: Get details of the book with it's ID
+      description: Get details of the book from it's ID in the library
+      operationId: getBookFromId
+      parameters:
+        - name: id
+          in: path
+          description: ID of the book to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        204:
+          description: Book not present in the library
+    delete:
+      tags:
+        - Admin
+      summary: Delete the book with it's ID
+      description: Delete the book from it's ID in the library
+      operationId: removeBook
+      parameters:
+        - name: id
+          in: path
+          description: ID of the book to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminResponse'
+        204:
+          description: Book not present in the library
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        genre:
+          type: string
+          enum:
+            - 'fiction'
+            - 'non-fiction'
+            - 'mystery'
+            - 'romance'
+            - 'sci-fi'
+        stocked:
+          type: boolean
+          default: true
+        publicationDate:
+          type: string
+          format: date
+        pageCount:
+          type: integer
+          format: int32
+      required:
+        - title
+        - author
+        - genre
+        - pageCount
+    AdminResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        result:
+          type: string
+          enum:
+            - SUCCESS
+            - FAILURE
+        isbn:
+          type: string
+        failure:
+          type: array
+          items:
+            $ref: '#/components/schemas/FaultObject'
+    FaultObject:
+      type: object
+      properties:
+        reasonCode:
+          type: string
+        reason:
+          type: string

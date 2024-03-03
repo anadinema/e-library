@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  psql-db:
+    container_name: 'postgresql-rest-books'
+    image: 'postgres:16.2'
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ~/$HOME/Developer/docker:/var/lib/postgresql/data
