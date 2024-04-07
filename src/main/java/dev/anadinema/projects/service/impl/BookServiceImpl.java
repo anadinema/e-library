@@ -59,8 +59,8 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public Response removeBook(Long id) {
-        Boolean result = BookEntity.deleteById(id);
-        if (Optional.ofNullable(result).isEmpty() || !result) {
+        boolean result = BookEntity.deleteById(id);
+        if (!result) {
             return Response.noContent().build();
         }
         return Response.ok(new AdminResponse().result(AdminResponse.ResultEnum.SUCCESS).id(id)).build();

@@ -7,8 +7,12 @@ import jakarta.ws.rs.core.Response;
 
 public class FetchController implements FetchApi {
 
+    private final BookService service;
+
     @Inject
-    BookService service;
+    public FetchController(BookService service) {
+        this.service = service;
+    }
 
     @Override
     public Response getAllBooks(Boolean inStock) {

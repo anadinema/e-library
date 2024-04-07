@@ -8,8 +8,12 @@ import jakarta.ws.rs.core.Response;
 
 public class AdminController implements AdminApi {
 
+    private final BookService service;
+
     @Inject
-    BookService service;
+    public AdminController(BookService service) {
+        this.service = service;
+    }
 
     @Override
     public Response createNewBook(Book book) {
